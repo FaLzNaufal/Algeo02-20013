@@ -54,14 +54,13 @@
             <div class="col-lg-6">
                <p>Image pixel percentage: 0 </p>
                <p>Image compression time: 0</p>
-            </div>
-         
+            </div>       
+         {% endif %}
          <div class="col-lg-6">
             <a href="{{ url_for('download_file',filename=filename) }}" class= "download-link">
                <button class="btn btn-success download-btn">Download</button>
             </a>
-         </div>         
-      {% endif %}
+         </div>  
       </div>
 
 </div>

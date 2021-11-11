@@ -1,6 +1,5 @@
 import os
 from flask import Flask, flash, request, redirect, url_for, render_template, send_from_directory
-from flask.helpers import flash
 from werkzeug.utils import secure_filename
 
 
@@ -13,7 +12,6 @@ if not os.path.exists(upload_folder):
 if not os.path.exists(download_folder):
     os.mkdir(download_folder)
 app.secret_key = b'mantap jiwa'
-app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = upload_folder
 app.config['DOWNLOAD_FOLDER'] = download_folder
 

@@ -1,5 +1,6 @@
 
 import numpy as np
+from scipy.linalg import hessenberg
 
 # Fungsi yang me-return matrix kosong berukuran nRow dan nCol
 def createMatrix(nRow,nCol) :
@@ -88,10 +89,18 @@ def eigenValues(matrix, nIteration = 50000) :
 
     result = [0 for i in range(n)]
     for j in range(n) :
-        result[j] = round(temp.item(j,j))
+        result[j] = round(temp.item(j,j),2)
     result = sorted(result, reverse=True)
 
     return result # result berisi eigenvalue terurut mengecil
+
+# Return array of eigenVector
+def eigenVector(matriks) :
+    temp = timesMatrix(matriks, inverseMatrix(getUpperTriangle(matriks)))
+    for i in range(len(temp)) :
+        for j in range(len(temp[0])) :
+            temp[i][j] = round(temp[i][j], 2)
+    return temp
 
 def timesMatrix(matrixA, matrixB) : # matrix A x matrix B
     temp = np.dot(matrixA, matrixB)
@@ -108,6 +117,21 @@ def getUpperTriangle(matrix) :
             r[row][col] = round(r[row][col], 2)
     return r
 
-a = np.matrix([[-26,-33,-25],[31,42,23],[-11,-15,-4]])    
-b = eigenValues(a)
-print(b)
+# Return Matriks Hessenberg
+def toHessenberg(matriks) :
+    temp = np.copy(matriks)
+    temp = hessenberg(temp, overwrite_a=True)
+    return temp
+
+matriks = [[2.5, 1.1, 0.3], [2.2, 1.9, 0.4], [1.8, 0.1, 0.3]]
+matriks = eigenVector(matriks)
+print(matriks)
+
+
+# a = np.matrix([[-26,-33,-25],[31,42,23],[-11,-15,-4]])   
+# a = toHessenberg(a)
+
+# print(a)
+# b = eigenValues(a)
+
+# print(b)

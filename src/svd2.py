@@ -46,7 +46,7 @@ def getUWithNullSpace(matrixAtA, eigenValues, sigmaValues): #tidak terpakai
     # u = np.transpose(np.array(u))
     return(u)
 
-def getU(matrix, eigenvector, sigmaValues): 
+def getV(matrix, eigenvector, sigmaValues): 
     u = []
     eigenVectorTransposed = np.transpose(eigenvector)
     #print("eig = ",eigenVectorTransposed[0].shape)
@@ -60,22 +60,25 @@ def getU(matrix, eigenvector, sigmaValues):
 
 def svd(matrix):
     transposed = np.transpose(matrix)
+    aat = np.matmul(matrix, transposed)
     ata = np.matmul(transposed, matrix)
-    eigenvalue, eigenvector = np.linalg.eig(ata)
-    vt = np.transpose(eigenvector)
-    sigmaValues = np.trim_zeros(getSigmaValues(eigenvalue))
+    eigenvaluekiri, eigenvectorkiri = np.linalg.eig(aat)
+    eigenvaluekanan, eigenvectorkanan = np.linalg.eig(ata)
+    sigmaValues = np.trim_zeros(getSigmaValues(eigenvaluekanan))
+    #vt = np.transpose(getV(ata, eigenvectorkanan, sigmaValues))
+    vt = np.transpose(eigenvectorkanan)
     sigma = getSigma(matrix, sigmaValues)
-    u = getU(matrix, eigenvector, sigmaValues)
-    return u, sigma, vt
+    print(vt)
+    return eigenvectorkiri, sigma, vt
 
 
 
-mat = np.array([[2, 2, 0], [-1, 1, 0]])
-mat = np.transpose(mat)
+mat = np.array([[3, 1, 1], [-1, 3, 1]])
+#mat = np.transpose(mat)
 #mat = readImage()
-u, sigma, vt = np.linalg.svd(mat, full_matrices=False)
-#u, sigma, vt = svd(mat)
-sigma = np.diag(sigma)
+#u, sigma, vt = np.linalg.svd(mat, full_matrices=False)
+u, sigma, vt = svd(mat)
+#sigma = np.diag(sigma)
 print("u = ", u.shape)
 print("sigma = ", sigma.shape)
 print("vt = ", vt.shape)

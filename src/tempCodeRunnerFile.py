@@ -1,0 +1,2 @@
+
+print("vt = ", vt.shape)

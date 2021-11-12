@@ -1,4 +1,3 @@
-
 import numpy as np
 from scipy.linalg import hessenberg
 
@@ -123,9 +122,9 @@ def toHessenberg(matriks) :
     temp = hessenberg(temp, overwrite_a=True)
     return temp
 
-matriks = [[2.5, 1.1, 0.3], [2.2, 1.9, 0.4], [1.8, 0.1, 0.3]]
-matriks = eigenVector(matriks)
-print(matriks)
+# matriks = [[2.5, 1.1, 0.3], [2.2, 1.9, 0.4], [1.8, 0.1, 0.3]]
+# matriks = eigenVector(matriks)
+# print(matriks)
 
 
 # a = np.matrix([[-26,-33,-25],[31,42,23],[-11,-15,-4]])   

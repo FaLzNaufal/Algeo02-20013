@@ -1,8 +1,10 @@
 
 import numpy as np
+from numpy import ma
 from numpy.ma.core import count
 from scipy.linalg import hessenberg
 import sympy as sy
+from sympy.utilities.iterables import bracelets
 
 # Fungsi yang me-return matrix kosong berukuran nRow dan nCol
 def createMatrix(nRow,nCol) :
@@ -114,6 +116,7 @@ def eigenVector(matriks, lamda) :
         if (col not in pivot) :
             for row in range(len(mat)) :
                 res[row][0] = -1 * mat[row][col]
+            break
 
     n = 0
     for row in range(len(res)):
@@ -132,7 +135,7 @@ def eigenVector(matriks, lamda) :
     I = np.eye(nRow, n, k=firstZero)
     res = res + I
     res = res.tolist()
-    
+
     return res
 
 def timesMatrix(matrixA, matrixB) : # matrix A x matrix B
@@ -157,6 +160,7 @@ def toHessenberg(matriks) :
     return temp
 
 
-a = np.matrix([[1, 2, 2], [2, 1, 1], [0, 0, 1]])
-a = eigenVector(a, 3)
-print(a)
+a = np.matrix([[3, -2, 0], [-2, 3, 0], [0, 0, 5]])
+b = eigenValues(a)
+a = eigenVector(a, 5)
+print(b)

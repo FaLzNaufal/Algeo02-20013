@@ -116,27 +116,30 @@ def eigenVector(matriks, lamda) :
 
     mat, pivot = gaussJordan(temp)
     mat = mat.tolist()
-    res = createMatrix(len(matriks),1)
+    n = len(mat) - len(pivot)
+    res = createMatrix(len(matriks),n)
     for col in range(len(mat[0])) :
         if (col not in pivot) :
+            i = 0
             for row in range(len(mat)) :
-                res[row][0] = -1 * mat[row][col]
-            break
+                res[row][i] = -1 * mat[row][col]
+            res[col][i] = 1
+            i += 1
 
-    n = len(mat) - len(pivot)
+    # n = len(mat) - len(pivot)
 
-    firstZero = 0
-    for row in range(len(res)) :
-        if res[row][0] == 0 :
-            firstZero = row
-            break
+    # firstZero = 0
+    # for row in range(len(res)) :
+    #     if res[row][0] == 0 :
+    #         firstZero = row
+    #         break
 
-    nRow = len(res)
-    firstZero *= -1
-    res = np.pad(res, ((0,0),(0,n-1)), mode='constant', constant_values=0)
-    I = np.eye(nRow, n, k=firstZero)
-    res = res + I
-    res = res.tolist()
+    # nRow = len(res)
+    # firstZero *= -1
+    # res = np.pad(res, ((0,0),(0,n-1)), mode='constant', constant_values=0)
+    # I = np.eye(nRow, n, k=firstZero)
+    # res = res + I
+    # res = res.tolist()
 
     return res
 
@@ -179,7 +182,7 @@ def toHessenberg(matriks) :
     return temp
 
 
-a = np.matrix([[11,1],[1,11]])
+a = np.matrix([[5,3,0],[3,5,0],[0,0,0]])
 b, c = eigen(a)
 print(b)
 print(c)

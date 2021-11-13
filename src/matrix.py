@@ -80,18 +80,26 @@ def inverseMatrix(matriks) :
 # Return nilai - nilai eigen
 def eigenValues(matrix, nIteration = 50000) :
     temp = np.copy(matrix) 
-    temp = toHessenberg(temp)
     n = temp.shape[0] 
-    for k in range(nIteration): 
-        s = temp.item(n-1, n-1) 
-        smult = s * np.eye(n)
-        Q, R = np.linalg.qr(np.subtract(temp, smult))
-        temp = np.add(R @ Q, smult)
+    if n == 2 :
+        temp = temp.tolist()
+        linier = temp[0][0] + temp[1][1]
+        linier *= -1
+        const = temp[0][0] * temp[1][1] - temp[0][1] * temp[1][0]
+        coeff = [1, linier, const]
+        result = np.roots(coeff)
+    else :
+        temp = toHessenberg(temp)
+        for k in range(nIteration): 
+            s = temp.item(n-1, n-1) 
+            smult = s * np.eye(n)
+            Q, R = np.linalg.qr(np.subtract(temp, smult))
+            temp = np.add(R @ Q, smult)
 
-    result = [0 for i in range(n)]
-    for j in range(n) :
-        result[j] = round(temp.item(j,j),2)
-    result = sorted(result, reverse=True)
+        result = [0 for i in range(n)]
+        for j in range(n) :
+            result[j] = round(temp.item(j,j),5)
+        result = sorted(result, reverse=True)
 
     return result # result berisi eigenvalue terurut mengecil
 
@@ -157,7 +165,6 @@ def toHessenberg(matriks) :
     return temp
 
 
-a = np.matrix([[3, -2, 0], [-2, 3, 0], [0, 0, 5]])
+a = np.matrix([[10,0,2],[0,10,4],[2,4,2]])
 b = eigenValues(a)
-a = eigenVector(a, 5)
 print(b)

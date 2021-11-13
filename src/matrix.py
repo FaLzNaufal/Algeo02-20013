@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.linalg import hessenberg
+import sympy as sy
 
 # Fungsi yang me-return matrix kosong berukuran nRow dan nCol
 def createMatrix(nRow,nCol) :
@@ -78,8 +79,8 @@ def inverseMatrix(matriks) :
 # Return nilai - nilai eigen
 def eigenValues(matrix, nIteration = 50000) :
     temp = np.copy(matrix) 
+    temp = toHessenberg(temp)
     n = temp.shape[0] 
-    I = np.eye(n) 
     for k in range(nIteration): 
         s = temp.item(n-1, n-1) 
         smult = s * np.eye(n)
@@ -93,13 +94,45 @@ def eigenValues(matrix, nIteration = 50000) :
 
     return result # result berisi eigenvalue terurut mengecil
 
-# Return array of eigenVector
-def eigenVector(matriks) :
-    temp = timesMatrix(matriks, inverseMatrix(getUpperTriangle(matriks)))
-    for i in range(len(temp)) :
-        for j in range(len(temp[0])) :
-            temp[i][j] = round(temp[i][j], 2)
-    return temp
+# return eselon baris tereduksi
+def gaussJordan(matriks) :
+    matriks, pivot = sy.Matrix(matriks).rref()
+    matriks = np.array(matriks.tolist())
+    return matriks, pivot
+
+def eigenVector(matriks, lamda) :
+    temp = np.copy(matriks)
+    I = np.eye(len(matriks)) * lamda
+    temp = np.subtract(temp, I)
+
+    mat, pivot = gaussJordan(temp)
+    mat = mat.tolist()
+    res = createMatrix(len(matriks),1)
+    for col in range(len(mat[0])) :
+        if (col not in pivot) :
+            for row in range(len(mat)) :
+                res[row][0] = -1 * mat[row][col]
+            break
+
+    n = 0
+    for row in range(len(res)):
+        if res[row][0] == 0 :
+            n += 1
+
+    firstZero = 0
+    for row in range(len(res)) :
+        if res[row][0] == 0 :
+            firstZero = row
+            break
+
+    nRow = len(res)
+    firstZero *= -1
+    res = np.pad(res, ((0,0),(0,n-1)), mode='constant', constant_values=0)
+    I = np.eye(nRow, n, k=firstZero)
+    res = res + I
+    res = res.tolist()
+
+    return res
 
 def timesMatrix(matrixA, matrixB) : # matrix A x matrix B
     temp = np.dot(matrixA, matrixB)
@@ -122,15 +155,8 @@ def toHessenberg(matriks) :
     temp = hessenberg(temp, overwrite_a=True)
     return temp
 
-# matriks = [[2.5, 1.1, 0.3], [2.2, 1.9, 0.4], [1.8, 0.1, 0.3]]
-# matriks = eigenVector(matriks)
-# print(matriks)
 
-
-# a = np.matrix([[-26,-33,-25],[31,42,23],[-11,-15,-4]])   
-# a = toHessenberg(a)
-
-# print(a)
+# a = np.matrix([[3, -2, 0], [-2, 3, 0], [0, 0, 5]])
 # b = eigenValues(a)
-
+# a = eigenVector(a, 5)
 # print(b)

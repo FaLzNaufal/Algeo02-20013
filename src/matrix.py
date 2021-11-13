@@ -1,6 +1,5 @@
 
 import numpy as np
-from numpy import ma
 from scipy.linalg import hessenberg
 import sympy as sy
 

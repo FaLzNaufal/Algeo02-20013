@@ -125,7 +125,6 @@ def eigenVector(matriks, lamda) :
 
     n = len(mat) - len(pivot)
 
-    
     firstZero = 0
     for row in range(len(res)) :
         if res[row][0] == 0 :
@@ -145,6 +144,7 @@ def eigen(matrix) :
     arr_of_lambda = eigenValues(matrix)
     arr_of_eigenvector = []
     for lamda in arr_of_lambda :
+        lamda = round(lamda)
         vector = eigenVector(matrix, lamda)
         sum = 0
         for item in vector :
@@ -179,7 +179,7 @@ def toHessenberg(matriks) :
     return temp
 
 
-a = np.matrix([[10,0,2], [0,10,4], [2,4,2]])
+a = np.matrix([[11,1],[1,11]])
 b, c = eigen(a)
 print(b)
 print(c)

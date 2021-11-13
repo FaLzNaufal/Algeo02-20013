@@ -1,5 +1,6 @@
 
 import numpy as np
+from numpy import ma
 from scipy.linalg import hessenberg
 import sympy as sy
 
@@ -99,9 +100,9 @@ def eigenValues(matrix, nIteration = 50000) :
         result = [0 for i in range(n)]
         for j in range(n) :
             result[j] = round(temp.item(j,j),5)
-        result = sorted(result, reverse=True)
+        result = sorted(result, reverse=False)
 
-    return result # result berisi eigenvalue terurut mengecil
+    return result # result berisi eigenvalue terurut membesar, biar mirip np.linalg.eig
 
 # return eselon baris tereduksi
 def gaussJordan(matriks) :
@@ -123,11 +124,9 @@ def eigenVector(matriks, lamda) :
                 res[row][0] = -1 * mat[row][col]
             break
 
-    n = 0
-    for row in range(len(res)):
-        if res[row][0] == 0 :
-            n += 1
+    n = len(mat) - len(pivot)
 
+    
     firstZero = 0
     for row in range(len(res)) :
         if res[row][0] == 0 :
@@ -142,6 +141,22 @@ def eigenVector(matriks, lamda) :
     res = res.tolist()
 
     return res
+
+def eigen(matrix) :
+    arr_of_lambda = eigenValues(matrix)
+    arr_of_eigenvector = []
+    for lamda in arr_of_lambda :
+        vector = eigenVector(matrix, lamda)
+        sum = 0
+        for item in vector :
+            sum += item[0] * item[0]
+        sum = sum ** 0.5
+        for i in range(len(vector)) :
+            vector[i] = (vector[i][0] / sum) * (-1)
+        arr_of_eigenvector.append(vector)
+    arr_of_eigenvector = transposeMatrix(arr_of_eigenvector)
+    arr_of_eigenvector = np.matrix(arr_of_eigenvector)
+    return arr_of_lambda, arr_of_eigenvector
 
 def timesMatrix(matrixA, matrixB) : # matrix A x matrix B
     temp = np.dot(matrixA, matrixB)
@@ -165,6 +180,11 @@ def toHessenberg(matriks) :
     return temp
 
 
-a = np.matrix([[10,0,2],[0,10,4],[2,4,2]])
-b = eigenValues(a)
+a = np.matrix([[10,0,2], [0,10,4], [2,4,2]])
+b, c = eigen(a)
 print(b)
+print(c)
+
+d, e = np.linalg.eig(a)
+print(d)
+print(e)

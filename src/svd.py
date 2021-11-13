@@ -6,7 +6,8 @@ from matrix import *
 from numpy import linalg as LA
 
 def readImage():
-    img = Image.open('D:\\ProjectKuliah\\AlGeo\\Algeo02-20013\\src\\static\\images\\pepe.png')
+    filename = input("input file name (located in ../images/): ")
+    img = Image.open('D:\\ProjectKuliah\\AlGeo\\Algeo02-20013\\src\\static\\images\\' + filename)
     imgFormat = img.format
     #imgMatrix = np.array(img.convert("L"))
     imgMatrix = np.array(img.convert("RGB"))
@@ -53,7 +54,6 @@ def getUWithNullSpace(matrix, matrixAtA, eigenValues, sigmaValues): #tidak terpa
 def getU(matrix, eigenvector, sigmaValues):
     u = []
     eigenVectorTransposed = np.transpose(eigenvector)
-    #print("eig = ",eigenVectorTransposed[0].shape)
     for i in range(len(sigmaValues)):
         tempU = (1/sigmaValues[i])*matrix
         tempUTransposed = np.transpose(tempU)
@@ -62,47 +62,61 @@ def getU(matrix, eigenvector, sigmaValues):
     u = np.transpose(np.array(u))
     return(u)
 
-def svd2(A): #ini gajadi
-    lam, v = LA.eig(A.T @ A)
+def svd2(matrix): #ini gajadi
+    transposed = np.transpose(matrix)
+    aat = np.matmul(matrix, transposed)
+    
+    eigenvalueaat, eigenvectoraat = np.linalg.eig(aat)
+    eigenvalueaat = np.sort(eigenvalueaat)[::-1]
+    sigmaValues = np.trim_zeros(getSigmaValues(eigenvalueaat))
+    sigma = getSigma(matrix, sigmaValues)
+    # squaredsigma = []
+    # if len(sigma) > len(sigma[0]):
+    #     squaredsigma = np.delete(sigma, np.s_[len(sigma[0]):], 0)
+    # else:
+    #     squaredsigma = np.delete(sigma, np.s_[len(sigma):], 1)
+    # vt = np.linalg.inv(squaredsigma) @ np.transpose(eigenvectoraat) @ matrix
+    ata = np.matmul(transposed, matrix)
+    eigenvalueata, eigenvectorata = np.linalg.eig(ata)
 
-    V = v[:, lam.argsort()[::-1]]
-
-    lam_sorted = np.sort(lam)[::-1]
-    lam_sorted = lam_sorted[lam_sorted > 1e-8]
-    sigma = np.sqrt(lam_sorted)
-    Sigma = np.zeros((A.shape[0], A.shape[1]))
-    Sigma[:min(A.shape[0],A.shape[1]), :min(A.shape[0],A.shape[1])] = np.diag(sigma)
-
-    # print("Sigma=", np.round(Sigma, 4))
-    # print("V=", np.round(V, 4))
-    r = len(sigma)
-    U = A @ V[:,:r] / sigma
-    # print("U=", np.round(U, 4))
-    a = np.arange(12).reshape(3, 4)
-    # print("a=",a)
-    # print("sigma=",Sigma)
-    # print("deleted = ",np.delete(Sigma, np.s_[(len(U[0])):], 0))
-    Sigma = np.delete(Sigma, np.s_[(len(U[0])):], 0)
-    return U, Sigma, np.transpose(V)
+    return eigenvectoraat, sigma, np.transpose(eigenvectorata)
 
 def svd(matrix):
+    print("transposing...")
     transposed = np.transpose(matrix)
-    ata = np.matmul(transposed, matrix)
+    print("transposed")
+    print("calculating ata...")
+    ata = transposed @ matrix
+    print("ata calculated")
+    print("calculating eigen...")
     eigenvalue, eigenvector = np.linalg.eig(ata)
     #eigenvalue, eigenvector = eigen(ata)
+    print("eigen calculated")
+    print("converting eigenvalue to real...")
     eigenvalue = np.real(eigenvalue)
+    print("eigenvalue converted to real")
+    print("converting eigenvector to real...")
     eigenvector =  np.real(eigenvector)
+    print("eigenvector converted to real")
+    print("sorting eigenvalue...")
     eigenvalue = np.sort(eigenvalue)[::-1]
-    # print("eigenvalue =", eigenvalue)
-    # print("eigenvaluebawaan =", eigenvaluebawaan)
-    # print("eigenvector =\n", eigenvector)
-    # print("eigenvectorbawaan =\n", eigenvectorbawaan)
+    print("eigenvalue sorted")
+    print("calculating vt...")
     vt = np.transpose(eigenvector)
+    print("vt calculated")
+    print("calculating sigmavalues...")
     sigmaValues = np.trim_zeros(getSigmaValues(eigenvalue))
+    print("sigmavalues calculated")
+    print("calculating sigma...")
     sigma = getSigma(matrix, sigmaValues)
+    print("sigma calculated")
+    print("calculating u...")
     u = getU(matrix, eigenvector, sigmaValues)
-    #u = getUWithNullSpace(matrix, ata, eigenvalue, sigmaValues)
+    print("u calculated")
+    print("trimming sigma...")
     sigma = np.delete(sigma, np.s_[(len(u[0])):], 0)
+    print("sigma trimmed")
+    print("svd done!")
     return u, sigma, vt
 
 
@@ -122,42 +136,30 @@ if(mat.ndim == 3):
     ur, sigmar, vtr = svd(R)
     ug, sigmag, vtg = svd(G)
     ub, sigmab, vtb = svd(B)
-    #r = int(input("input r: "))
-    r = 1
-    while r<=128:
-
-        recr = ur[:,:r].dot(sigmar[0:r, :r]).dot(vtr[:r, :])
-        recg = ug[:,:r].dot(sigmag[0:r, :r]).dot(vtg[:r, :])
-        recb = ub[:,:r].dot(sigmab[0:r, :r]).dot(vtb[:r, :])
-        rec = np.zeros(mat.shape)
-        rec[:,:,0] = recr
-        rec[:,:,1] = recg
-        rec[:,:,2] = recb
-        #print("reconstructed shape: ", rec.shape)
-        rec = rec.astype(np.uint8)
-        resized = Image.fromarray(rec)
-        #resized = resized.convert('RGB')
-        #filename = input("input file name: ")
-        filename = "resized"
-        resized.save(filename + str(r) + "." + imgFormat.lower(), format = imgFormat.lower())
-        if r==1:
-            r+=3
-        else:
-            r+=4
+    r = int(input("input r: "))
+    recr = ur[:,:r].dot(sigmar[0:r, :r]).dot(vtr[:r, :])
+    recg = ug[:,:r].dot(sigmag[0:r, :r]).dot(vtg[:r, :])
+    recb = ub[:,:r].dot(sigmab[0:r, :r]).dot(vtb[:r, :])
+    rec = np.zeros(mat.shape)
+    rec[:,:,0] = recr
+    rec[:,:,1] = recg
+    rec[:,:,2] = recb
+    rec = rec.astype(np.uint8)
+    print(rec)
+    resized = Image.fromarray(rec)
+    filename = input("input file name: ")
+    resized.save(filename + "." + imgFormat.lower(), format = imgFormat.lower())
 else:
     u, sigma, vt = svd(mat)
-    #sigma = np.diag(sigma)
     # print("u = ", u)
     # print("sigma = ", sigma)
     # print("vt = ", vt)
-    #print("reconstructed = ", u.dot(sigma).dot(vt))
-
-    #print("reconstructed size = ", u.dot(sigma).dot(vt).shape)
+    # print("reconstructed = ", u.dot(sigma).dot(vt))
     r = int(input("input r: "))
     rec = u[:,:r].dot(sigma[0:r, :r]).dot(vt[:r, :])
     rec = rec.astype(np.uint8)
     resized = Image.fromarray(rec)
     resized = resized.convert('RGB')
-    #filename = input("input file name: ")
+    filename = input("input file name: ")
     filename = "resized"
     resized.save(filename + "." + imgFormat.lower(), format = imgFormat.lower())

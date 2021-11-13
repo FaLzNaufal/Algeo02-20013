@@ -79,20 +79,28 @@ def inverseMatrix(matriks) :
 # Return nilai - nilai eigen
 def eigenValues(matrix, nIteration = 50000) :
     temp = np.copy(matrix) 
-    temp = toHessenberg(temp)
     n = temp.shape[0] 
-    for k in range(nIteration): 
-        s = temp.item(n-1, n-1) 
-        smult = s * np.eye(n)
-        Q, R = np.linalg.qr(np.subtract(temp, smult))
-        temp = np.add(R @ Q, smult)
+    if n == 2 :
+        temp = temp.tolist()
+        linier = temp[0][0] + temp[1][1]
+        linier *= -1
+        const = temp[0][0] * temp[1][1] - temp[0][1] * temp[1][0]
+        coeff = [1, linier, const]
+        result = np.roots(coeff)
+    else :
+        temp = toHessenberg(temp)
+        for k in range(nIteration): 
+            s = temp.item(n-1, n-1) 
+            smult = s * np.eye(n)
+            Q, R = np.linalg.qr(np.subtract(temp, smult))
+            temp = np.add(R @ Q, smult)
 
-    result = [0 for i in range(n)]
-    for j in range(n) :
-        result[j] = round(temp.item(j,j),2)
-    result = sorted(result, reverse=True)
+        result = [0 for i in range(n)]
+        for j in range(n) :
+            result[j] = round(temp.item(j,j),5)
+        result = sorted(result, reverse=False)
 
-    return result # result berisi eigenvalue terurut mengecil
+    return result # result berisi eigenvalue terurut membesar, biar mirip np.linalg.eig
 
 # return eselon baris tereduksi
 def gaussJordan(matriks) :
@@ -114,11 +122,9 @@ def eigenVector(matriks, lamda) :
                 res[row][0] = -1 * mat[row][col]
             break
 
-    n = 0
-    for row in range(len(res)):
-        if res[row][0] == 0 :
-            n += 1
+    n = len(mat) - len(pivot)
 
+    
     firstZero = 0
     for row in range(len(res)) :
         if res[row][0] == 0 :
@@ -133,6 +139,22 @@ def eigenVector(matriks, lamda) :
     res = res.tolist()
 
     return res
+
+def eigen(matrix) :
+    arr_of_lambda = eigenValues(matrix)
+    arr_of_eigenvector = []
+    for lamda in arr_of_lambda :
+        vector = eigenVector(matrix, lamda)
+        sum = 0
+        for item in vector :
+            sum += item[0] * item[0]
+        sum = sum ** 0.5
+        for i in range(len(vector)) :
+            vector[i] = (vector[i][0] / sum) * (-1)
+        arr_of_eigenvector.append(vector)
+    arr_of_eigenvector = transposeMatrix(arr_of_eigenvector)
+    arr_of_eigenvector = np.matrix(arr_of_eigenvector)
+    return arr_of_lambda, arr_of_eigenvector
 
 def timesMatrix(matrixA, matrixB) : # matrix A x matrix B
     temp = np.dot(matrixA, matrixB)
@@ -156,7 +178,11 @@ def toHessenberg(matriks) :
     return temp
 
 
-# a = np.matrix([[3, -2, 0], [-2, 3, 0], [0, 0, 5]])
-# b = eigenValues(a)
-# a = eigenVector(a, 5)
+# a = np.matrix([[10,0,2], [0,10,4], [2,4,2]])
+# b, c = eigen(a)
 # print(b)
+# print(c)
+
+# d, e = np.linalg.eig(a)
+# print(d)
+# print(e)

@@ -6,9 +6,12 @@ from matrix import *
 from numpy import linalg as LA
 
 def readImage():
-    img = Image.open('D:\ProjectKuliah\AlGeo\Algeo02-20013\src\pepe.png')
-    imgMatrix = np.array(img.convert("L"))
-    return imgMatrix
+    img = Image.open('D:\\ProjectKuliah\\AlGeo\\Algeo02-20013\\src\\static\\images\\pepe.png')
+    imgFormat = img.format
+    #imgMatrix = np.array(img.convert("L"))
+    imgMatrix = np.array(img.convert("RGB"))
+    #imgMatrix = np.asarray(img).astype(np.uint8)
+    return imgMatrix, imgFormat
 
 def transpose(matrix): #tidak dipakai, jadinya pakai fungsi bawaan numpy
     return np.array([[matrix[j][i] for j in range(len(matrix))] for i in range(len(matrix[0]))])
@@ -85,15 +88,15 @@ def svd2(A): #ini gajadi
 def svd(matrix):
     transposed = np.transpose(matrix)
     ata = np.matmul(transposed, matrix)
-    eigenvaluebawaan, eigenvectorbawaan = np.linalg.eig(ata)
-    eigenvalue, eigenvector = eigen(ata)
+    eigenvalue, eigenvector = np.linalg.eig(ata)
+    #eigenvalue, eigenvector = eigen(ata)
     eigenvalue = np.real(eigenvalue)
     eigenvector =  np.real(eigenvector)
     eigenvalue = np.sort(eigenvalue)[::-1]
-    print("eigenvalue =", eigenvalue)
-    print("eigenvaluebawaan =", eigenvaluebawaan)
-    print("eigenvector =\n", eigenvector)
-    print("eigenvectorbawaan =\n", eigenvectorbawaan)
+    # print("eigenvalue =", eigenvalue)
+    # print("eigenvaluebawaan =", eigenvaluebawaan)
+    # print("eigenvector =\n", eigenvector)
+    # print("eigenvectorbawaan =\n", eigenvectorbawaan)
     vt = np.transpose(eigenvector)
     sigmaValues = np.trim_zeros(getSigmaValues(eigenvalue))
     sigma = getSigma(matrix, sigmaValues)
@@ -105,14 +108,13 @@ def svd(matrix):
 
 
 #mat = np.array([[3, 1, 1], [-1, 3, 1]])
-mat = np.array([[2, 2, 0], [-1, 1, 0]])
+#mat = np.array([[2, 2, 0], [-1, 1, 0]])
 #mat = np.array([[4, 1, 3],[8, 3, -2]])
 #mat = np.array([[2, 1, 0, 0],[4, 3, 0, 0]])
-# mat = np.transpose(mat)
-#mat = readImage()
-R = []
-G = []
-B = []
+#mat = np.transpose(mat)
+mat, imgFormat = readImage()
+print(imgFormat)
+print("image shape = ", mat.shape)
 if(mat.ndim == 3):
     R = mat[:,:,0]
     G = mat[:,:,1]
@@ -120,29 +122,42 @@ if(mat.ndim == 3):
     ur, sigmar, vtr = svd(R)
     ug, sigmag, vtg = svd(G)
     ub, sigmab, vtb = svd(B)
-    r = int(input("input r: "))
-    recr = ur[:,:r].dot(sigmar[0:r, :r]).dot(vtr[:r, :])
-    recg = ug[:,:r].dot(sigmag[0:r, :r]).dot(vtg[:r, :])
-    recb = ub[:,:r].dot(sigmab[0:r, :r]).dot(vtb[:r, :])
-    rec = np.zeros(mat.shape)
-    print(rec.shape)
-    rec[:,:,0] = recr
-    rec[:,:,1] = recg
-    rec[:,:,2] = recb
-    resized = Image.fromarray(rec)
-    #resized = resized.convert('RGB')
-    resized.save("resized.png")
+    #r = int(input("input r: "))
+    r = 1
+    while r<=128:
+
+        recr = ur[:,:r].dot(sigmar[0:r, :r]).dot(vtr[:r, :])
+        recg = ug[:,:r].dot(sigmag[0:r, :r]).dot(vtg[:r, :])
+        recb = ub[:,:r].dot(sigmab[0:r, :r]).dot(vtb[:r, :])
+        rec = np.zeros(mat.shape)
+        rec[:,:,0] = recr
+        rec[:,:,1] = recg
+        rec[:,:,2] = recb
+        #print("reconstructed shape: ", rec.shape)
+        rec = rec.astype(np.uint8)
+        resized = Image.fromarray(rec)
+        #resized = resized.convert('RGB')
+        #filename = input("input file name: ")
+        filename = "resized"
+        resized.save(filename + str(r) + "." + imgFormat.lower(), format = imgFormat.lower())
+        if r==1:
+            r+=3
+        else:
+            r+=4
 else:
     u, sigma, vt = svd(mat)
-    # sigma = np.diag(sigma)
-    print("u = ", u)
-    print("sigma = ", sigma)
-    print("vt = ", vt)
+    #sigma = np.diag(sigma)
+    # print("u = ", u)
+    # print("sigma = ", sigma)
+    # print("vt = ", vt)
     #print("reconstructed = ", u.dot(sigma).dot(vt))
 
-    # print("reconstructed size = ", u.dot(sigma).dot(vt).shape)
-    # r = int(input("input r: "))
-    # rec = u[:,:r].dot(sigma[0:r, :r]).dot(vt[:r, :])
-    # resized = Image.fromarray(rec)
-    # resized = resized.convert('RGB')
-    # resized.save("resized.png")
+    #print("reconstructed size = ", u.dot(sigma).dot(vt).shape)
+    r = int(input("input r: "))
+    rec = u[:,:r].dot(sigma[0:r, :r]).dot(vt[:r, :])
+    rec = rec.astype(np.uint8)
+    resized = Image.fromarray(rec)
+    resized = resized.convert('RGB')
+    #filename = input("input file name: ")
+    filename = "resized"
+    resized.save(filename + "." + imgFormat.lower(), format = imgFormat.lower())

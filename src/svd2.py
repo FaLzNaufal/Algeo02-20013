@@ -30,23 +30,20 @@ def getSigmaValues(eigenvalues):
         sigmaValues[i] = math.sqrt(abs(eigenvalues[i]))
     return sigmaValues
 
-def getUWithNullSpace(matrixAtA, eigenValues, sigmaValues): #tidak terpakai
-    u = np.array([])
+def getUWithNullSpace(matrix, matrixAtA, eigenValues, sigmaValues): #tidak terpakai
+    u = np.array([[] for i in range(len(matrix))])
     
-    for i in range(len(eigenValues)):
+    for i in range(len(matrix)):
         tmp = np.array(matrixAtA, copy=True)
         for j in range(len(tmp)):
             tmp[j][j] -= eigenValues[i]
         ns = null_space(tmp)
-       
-        #ns = ns * np.sign(ns[0,0])
-        ns = np.transpose(ns)
-        print("ns = ",ns)
-        np.append(u, ns)
+        ns = ns * np.sign(ns[0,0])*matrix
+        u = np.append(u, ns, axis = 1)
     # u = np.transpose(np.array(u))
     return(u)
 
-def getV(matrix, eigenvector, sigmaValues): 
+def getU(matrix, eigenvector, sigmaValues): 
     u = []
     eigenVectorTransposed = np.transpose(eigenvector)
     #print("eig = ",eigenVectorTransposed[0].shape)
@@ -62,29 +59,36 @@ def svd(matrix):
     transposed = np.transpose(matrix)
     aat = np.matmul(matrix, transposed)
     ata = np.matmul(transposed, matrix)
-    eigenvaluekiri, eigenvectorkiri = np.linalg.eig(aat)
-    eigenvaluekanan, eigenvectorkanan = np.linalg.eig(ata)
-    sigmaValues = np.trim_zeros(getSigmaValues(eigenvaluekanan))
-    #vt = np.transpose(getV(ata, eigenvectorkanan, sigmaValues))
-    vt = np.transpose(eigenvectorkanan)
+    eigenvalueaat, eigenvectoraat = np.linalg.eig(aat)
+    eigenvalueata, eigenvectorata = np.linalg.eig(ata)
+    eigenvalueaat = np.sort(eigenvalueaat)[::-1]
+    eigenvalueata = np.sort(eigenvalueata)[::-1]
+    vt = np.transpose(eigenvectorata)
+    sigmaValues = np.trim_zeros(getSigmaValues(eigenvalueaat))
     sigma = getSigma(matrix, sigmaValues)
-    print(vt)
-    return eigenvectorkiri, sigma, vt
+    #u = getU(matrix, eigenvector, sigmaValues)
+    #u = getUWithNullSpace(matrix, ata, eigenvalueaat, sigmaValues)
+    u = eigenvectoraat
+    vt = np.transpose(eigenvectorata)
+    return u, sigma, vt
 
 
 
-mat = np.array([[3, 1, 1], [-1, 3, 1]])
+#mat = np.array([[3, 1, 1], [-1, 3, 1]])
+#mat = np.array([[2, 2, 0], [-1, 1, 0]])
+mat = np.array([[2, 1, 0, 0], [4, 3, 0, 0]])
+#mat = np.array([[3, 2, 2], [2, 3, -2]])
 #mat = np.transpose(mat)
 #mat = readImage()
-#u, sigma, vt = np.linalg.svd(mat, full_matrices=False)
 u, sigma, vt = svd(mat)
-#sigma = np.diag(sigma)
-print("u = ", u.shape)
-print("sigma = ", sigma.shape)
-print("vt = ", vt.shape)
+# sigma = np.diag(sigma)
+print("u = ", u)
+print("sigma = ", sigma)
+print("vt = ", vt)
+
 
 print("rec = ", u.dot(sigma).dot(vt))
 # r = int(input())
 # rec = u[:,:r].dot(sigma[0:r, :r]).dot(vt[:r, :])
-# resized = Image.fromarray(rec)
+# resized = Image.fromarray(mat)
 # resized.show()

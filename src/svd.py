@@ -85,10 +85,15 @@ def svd2(A): #ini gajadi
 def svd(matrix):
     transposed = np.transpose(matrix)
     ata = np.matmul(transposed, matrix)
-    eigenvalue, eigenvector = np.linalg.eig(ata)
+    eigenvaluebawaan, eigenvectorbawaan = np.linalg.eig(ata)
+    eigenvalue, eigenvector = eigen(ata)
     eigenvalue = np.real(eigenvalue)
     eigenvector =  np.real(eigenvector)
     eigenvalue = np.sort(eigenvalue)[::-1]
+    print("eigenvalue =", eigenvalue)
+    print("eigenvaluebawaan =", eigenvaluebawaan)
+    print("eigenvector =\n", eigenvector)
+    print("eigenvectorbawaan =\n", eigenvectorbawaan)
     vt = np.transpose(eigenvector)
     sigmaValues = np.trim_zeros(getSigmaValues(eigenvalue))
     sigma = getSigma(matrix, sigmaValues)
@@ -100,11 +105,11 @@ def svd(matrix):
 
 
 #mat = np.array([[3, 1, 1], [-1, 3, 1]])
-#mat = np.array([[2, 2, 0], [-1, 1, 0]])
+mat = np.array([[2, 2, 0], [-1, 1, 0]])
 #mat = np.array([[4, 1, 3],[8, 3, -2]])
-# mat = np.array([[2, 1, 0, 0],[4, 3, 0, 0]])
+#mat = np.array([[2, 1, 0, 0],[4, 3, 0, 0]])
 # mat = np.transpose(mat)
-mat = readImage()
+#mat = readImage()
 R = []
 G = []
 B = []
@@ -129,16 +134,15 @@ if(mat.ndim == 3):
     resized.save("resized.png")
 else:
     u, sigma, vt = svd(mat)
-#u, sigma, vt = svd(mat)
-#u, sigma, vt = svd(mat)
-#sigma = np.diag(sigma)
-# print("u = ", u)
-# print("sigma = ", sigma)
-# print("vt = ", vt)
+    # sigma = np.diag(sigma)
+    print("u = ", u)
+    print("sigma = ", sigma)
+    print("vt = ", vt)
+    #print("reconstructed = ", u.dot(sigma).dot(vt))
 
-    print("reconstructed size = ", u.dot(sigma).dot(vt).shape)
-    r = int(input("input r: "))
-    rec = u[:,:r].dot(sigma[0:r, :r]).dot(vt[:r, :])
-    resized = Image.fromarray(rec)
-    resized = resized.convert('RGB')
-    resized.save("resized.png")
+    # print("reconstructed size = ", u.dot(sigma).dot(vt).shape)
+    # r = int(input("input r: "))
+    # rec = u[:,:r].dot(sigma[0:r, :r]).dot(vt[:r, :])
+    # resized = Image.fromarray(rec)
+    # resized = resized.convert('RGB')
+    # resized.save("resized.png")

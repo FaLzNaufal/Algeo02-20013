@@ -3,7 +3,6 @@ import math
 from PIL import Image
 from scipy.linalg.decomp_svd import null_space
 from matrix import *
-from eigen import *
 import time
 
 def readImageFromFileName(filename):
@@ -159,7 +158,7 @@ def mainprog():
     print("compression rate ((compressed bytes)/(original bytes)):", str(compressionRate) + "%")
 
 
-# filename = input()
-# r = int(input())
-# compressionRate, runTime = compress(filename, r)
-# print(compressionRate, runTime)
+filename = input()
+r = int(input())
+compressionRate, runTime = compress(filename, r)
+print(compressionRate, runTime)

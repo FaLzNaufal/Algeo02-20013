@@ -4,7 +4,14 @@ from PIL import Image
 from scipy.linalg.decomp_svd import null_space
 from matrix import *
 from eigen import *
+import time
 
+def readImageFromFileName(filename):
+    img = Image.open('src\\static\\uploads\\' + filename)
+    imgFormat = img.format
+    mode = input("For RGB, type 'RGB'. For grayscale type 'L': ")
+    imgMatrix = np.array(img.convert(mode.upper()))
+    return imgMatrix, imgFormat
 def readImage(): #fungsi membaca image dari input user, mengembalikan matriks dari gambar dan format gambar
     filename = input("input file name (located in ../images/): ")
     img = Image.open('D:\\ProjectKuliah\\AlGeo\\Algeo02-20013\\src\\static\\images\\' + filename)
@@ -116,30 +123,62 @@ def getCompressed(matrix, r): #fungsi menerima matrix dan r (berapa nilai pentin
     fullSVDBytes = sum([m.nbytes for m in [u, sigma, vt]])
     return (compressedU @ compressedSigma @ compressedVt), compressedBytes, fullSVDBytes
 
-mat, imgFormat = readImage()
-print("output format will be:", imgFormat)
-imgShape = mat.shape
-print("image shape:", imgShape)
-r = int(input("input r (from 1 to " + str(imgShape[1]) + "): "))
-compressedBytes = 0
-fullSVDBytes = 0
-if(mat.ndim == 3):
-    rec = np.zeros(mat.shape)
-    rec[:,:,0], cbr, fsvdbr = getCompressed(mat[:,:,0], r)
-    rec[:,:,1], cbg, fsvdbg = getCompressed(mat[:,:,1], r)
-    rec[:,:,2], cbb, fsvdbb = getCompressed(mat[:,:,2], r)
-    compressedBytes = cbr+cbg+cbb
-    fullSVDBytes = fsvdbr+fsvdbg+fsvdbb
-    rec = rec.astype(np.uint8)
-    resized = Image.fromarray(rec)
-else:
-    rec, compressedBytes, fullSVDBytes = getCompressed(mat, r)
-    rec = rec.astype(np.uint8)
-    resized = Image.fromarray(rec).convert('RGB')
+def compress(filename, r):
+    startTime = time.time()
+    mat, imgFormat = readImageFromFileName(filename)
+    print("output format will be:", imgFormat)
+    imgShape = mat.shape
+    print("image shape:", imgShape)
+    r = int(input("input r (from 1 to " + str(imgShape[1]) + "): "))
+    compressedBytes = 0
+    fullSVDBytes = 0
+    if(mat.ndim == 3):
+        rec = np.zeros(mat.shape)
+        rec[:,:,0], cbr, fsvdbr = getCompressed(mat[:,:,0], r)
+        rec[:,:,1], cbg, fsvdbg = getCompressed(mat[:,:,1], r)
+        rec[:,:,2], cbb, fsvdbb = getCompressed(mat[:,:,2], r)
+        compressedBytes = cbr+cbg+cbb
+        fullSVDBytes = fsvdbr+fsvdbg+fsvdbb
+        rec = rec.astype(np.uint8)
+        resized = Image.fromarray(rec)
+    else:
+        rec, compressedBytes, fullSVDBytes = getCompressed(mat, r)
+        rec = rec.astype(np.uint8)
+        resized = Image.fromarray(rec).convert('RGB')
 
-filename = input("input file name (without format): ")
-resized.save(filename + "." + imgFormat.lower(), format = imgFormat.lower())
-originalBytes = mat.nbytes
-print("original bytes:", originalBytes, "\nfull svd bytes:", fullSVDBytes, "\ncompressed bytes: ", compressedBytes)
-compressionRate = compressedBytes*100/originalBytes
-print("compression rate ((compressed bytes)/(original bytes)):", str(compressionRate) + "%")
+    resized.save(filename + "." + imgFormat.lower(), format = imgFormat.lower())
+    originalBytes = mat.nbytes
+    print("original bytes:", originalBytes, "\nfull svd bytes:", fullSVDBytes, "\ncompressed bytes: ", compressedBytes)
+    compressionRate = compressedBytes*100/originalBytes
+    print("compression rate ((compressed bytes)/(original bytes)):", str(compressionRate) + "%")
+    runTime = startTime - time.time()
+    return compressionRate, runTime
+
+
+# mat, imgFormat = readImage()
+# print("output format will be:", imgFormat)
+# imgShape = mat.shape
+# print("image shape:", imgShape)
+# r = int(input("input r (from 1 to " + (str(max(imgShape[0], imgShape[1]))) + "): "))
+# compressedBytes = 0
+# fullSVDBytes = 0
+# if(mat.ndim == 3):
+#     rec = np.zeros(mat.shape)
+#     rec[:,:,0], cbr, fsvdbr = getCompressed(mat[:,:,0], r)
+#     rec[:,:,1], cbg, fsvdbg = getCompressed(mat[:,:,1], r)
+#     rec[:,:,2], cbb, fsvdbb = getCompressed(mat[:,:,2], r)
+#     compressedBytes = cbr+cbg+cbb
+#     fullSVDBytes = fsvdbr+fsvdbg+fsvdbb
+#     rec = rec.astype(np.uint8)
+#     resized = Image.fromarray(rec)
+# else:
+#     rec, compressedBytes, fullSVDBytes = getCompressed(mat, r)
+#     rec = rec.astype(np.uint8)
+#     resized = Image.fromarray(rec).convert('RGB')
+
+# filename = input("input file name (without format): ")
+# resized.save(filename + "." + imgFormat.lower(), format = imgFormat.lower())
+# originalBytes = mat.nbytes
+# print("original bytes:", originalBytes, "\nfull svd bytes:", fullSVDBytes, "\ncompressed bytes: ", compressedBytes)
+# compressionRate = compressedBytes*100/originalBytes
+# print("compression rate ((compressed bytes)/(original bytes)):", str(compressionRate) + "%")

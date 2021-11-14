@@ -1,7 +1,7 @@
 import numpy as np
 from sympy import *
 
-def eig(mat) :
+def eigen(mat) :
 
     x = Symbol('x') # Anggap aja lambda
     I = (eye(shape(mat)[0]) * x) - mat

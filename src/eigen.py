@@ -1,6 +1,6 @@
 import numpy as np
 
-def eig(a):
+def eigQR(a):
     pQ = np.eye(a.shape[0])
     temp = a.copy()
     for i in range(10):

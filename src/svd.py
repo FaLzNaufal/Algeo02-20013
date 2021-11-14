@@ -96,7 +96,7 @@ def getCompressed(matrix, r): #fungsi menerima matrix dan r (berapa nilai pentin
     compressedU = u[:,:r]
     compressedSigma = sigma[0:r, :r]
     compressedVt = vt[:r, :]
-    compressedBytes = sum([m.nbytes for m in [compressedU, compressedSigma, compressedVt]])
+    compressedBytes = sum([m.nbytes for m in [compressedU, np.diag(compressedSigma), compressedVt]])
     fullSVDBytes = sum([m.nbytes for m in [u, sigma, vt]])
     return (compressedU @ compressedSigma @ compressedVt), compressedBytes, fullSVDBytes
 

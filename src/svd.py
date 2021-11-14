@@ -158,7 +158,7 @@ def mainprog():
     print("compression rate ((compressed bytes)/(original bytes)):", str(compressionRate) + "%")
 
 
-filename = input()
-r = int(input())
-compressionRate, runTime = compress(filename, r)
-print(compressionRate, runTime)
+# filename = input()
+# r = int(input())
+# compressionRate, runTime = compress(filename, r)
+# print(compressionRate, runTime)

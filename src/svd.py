@@ -6,7 +6,7 @@ from matrix import *
 import time
 
 def readImageFromFileName(filename):
-    img = Image.open('src\\static\\images\\' + filename)
+    img = Image.open('static/uploads/' + filename)
     imgFormat = img.format
     mode = 'RGB'
     imgMatrix = np.array(img.convert(mode.upper()))
@@ -14,7 +14,7 @@ def readImageFromFileName(filename):
 
 def readImage(): #fungsi membaca image dari input user, mengembalikan matriks dari gambar dan format gambar
     filename = input("input file name (located in ../images/): ")
-    img = Image.open('D:\\ProjectKuliah\\AlGeo\\Algeo02-20013\\src\\static\\images\\' + filename)
+    img = Image.open('static/images/' + filename)
     imgFormat = img.format
     mode = input("For RGB, type 'RGB'. For grayscale type 'L': ")
     imgMatrix = np.array(img.convert(mode.upper()))
@@ -120,10 +120,12 @@ def compress(filename, rPercentage):
         rec, compressedBytes, fullSVDBytes = getCompressed(mat, r)
         rec = rec.astype(np.uint8)
         resized = Image.fromarray(rec).convert('RGB')
-    resized.save(filename)
+    resized.save("static/downloads/" + filename)
     originalBytes = mat.nbytes
     compressionRate = compressedBytes*100/originalBytes
     runTime = time.time() - startTime
+    print("original bytes:", originalBytes, "\ncompressed bytes: ", compressedBytes)
+    print("compression rate ((compressed bytes)/(original bytes)):", str(compressionRate) + "%")
     return compressionRate, runTime
 
 def mainprog():
@@ -152,7 +154,7 @@ def mainprog():
         resized = Image.fromarray(rec).convert('RGB')
 
     filename = input("input file name (without format): ")
-    resized.save(filename + "." + imgFormat.lower(), format = imgFormat.lower())
+    resized.save("static/downloads/" + filename)
     print("original bytes:", originalBytes, "\nfull svd bytes:", fullSVDBytes, "\ncompressed bytes: ", compressedBytes)
     compressionRate = compressedBytes*100/originalBytes
     print("compression rate ((compressed bytes)/(original bytes)):", str(compressionRate) + "%")

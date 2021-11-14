@@ -1,12 +1,12 @@
 import os
 from flask import Flask, flash, request, redirect, url_for, render_template, send_from_directory
 from werkzeug.utils import secure_filename
-
+from svd import compress
 
 app = Flask(__name__)
 
 upload_folder = "static/uploads/"
-download_folder = "static/uploads/"
+download_folder = "static/downloads/"
 if not os.path.exists(upload_folder):
     os.mkdir(upload_folder)
 if not os.path.exists(download_folder):
@@ -43,16 +43,13 @@ def upload_file():
             else:
                 num = int(num)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                # compress_file(os.path.join(app.config['UPLOAD_FOLDER'], filename), filename, num)
-                return render_template('index.html',filename=filename)
+                percentage, runtime = compress(filename, num)
+                percentage = float("{:.2f}".format(percentage))
+                runtime = float("{:.2f}".format(runtime))
+                return render_template('index.html',filename=filename, percentage=percentage,tcomp=runtime)
         else :
             flash('Format file tidak diperbolehkan.')
             return redirect(request.url)
-
-#Funtion to compress image
-# def compress_file(path, filename):
-#     output = open(app.config['DOWNLOAD_FOLDER'] + filename, 'wb')
-
 
 @app.route('/downloads/<filename>')
 def download_file(filename):

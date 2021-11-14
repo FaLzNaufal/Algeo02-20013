@@ -9,6 +9,8 @@ def readImageFromFileName(filename):
     img = Image.open('static/uploads/' + filename)
     imgFormat = img.format
     mode = 'RGB'
+    if imgFormat == 'PNG':
+        mode = 'RGBA'
     imgMatrix = np.array(img.convert(mode.upper()))
     return imgMatrix.astype(float), imgFormat
 
@@ -64,7 +66,11 @@ def svd3(matrix):
     ata = np.transpose(matrix) @ matrix
     sigma, v = eigQR(ata)
     diagSigma = np.diag(sigma)
-    u = matrix @ v @ np.linalg.inv(diagSigma)
+    try:
+        u = matrix @ v @ np.linalg.inv(diagSigma)
+    except:
+        diagSigma = np.add(diagSigma, np.random.rand(diagSigma.shape[0], diagSigma.shape[1]))
+        u = matrix @ v @ np.linalg.inv(diagSigma)
     return u, sigma, np.transpose(v)
 
 def svd2(matrix): #cara lain mendapat svd, namun khusus untuk matrix persegi, tidak terpakai
@@ -85,6 +91,9 @@ def svd1(matrix):
     eigenvalue = np.sort(eigenvalue)[::-1]
     vt = np.transpose(eigenvector)
     sigmaValues = np.trim_zeros(getSigmaValues(eigenvalue))
+    while(len(sigmaValues) < eigenvector.shape[1]):
+        x = 0.0000000000000000000001*np.random.rand()
+        sigmaValues = np.append(sigmaValues, x)
     u = matrix @ eigenvector / sigmaValues
     return u, sigmaValues, vt
 
@@ -107,12 +116,15 @@ def compress(filename, rPercentage):
     imgShape = mat.shape
     compressedBytes = 0
     r = int((rPercentage*(max(imgShape[0], imgShape[1])))/100)
-    if(mat.ndim == 3):
-        rec = np.zeros(mat.shape)
+    print(r)
+    if (mat.ndim == 3):
+        rec = np.copy(mat)
         rec[:,:,0], cbr, fsvdbr = getCompressed(mat[:,:,0], r)
         rec[:,:,1], cbg, fsvdbg = getCompressed(mat[:,:,1], r)
         rec[:,:,2], cbb, fsvdbb = getCompressed(mat[:,:,2], r)
         compressedBytes = cbr+cbg+cbb
+        if(mat.shape[2] == 4):
+            compressedBytes+=mat[:,:,3].nbytes
         rec = np.clip(rec, 0, 255)
         rec = rec.astype(np.uint8)
         resized = Image.fromarray(rec)

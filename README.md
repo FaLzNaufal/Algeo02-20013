@@ -11,7 +11,12 @@
 Website dapat menerima gambar dari user, dan menerima nilai persentase r (r/rmax) yang digunakan sebagai acuan dalam mengompresi gambar.
 
 ## Screenshots
-
+### Landing Page
+![Landing Page](./src/static/images/landingpage.png)
+### Compressed
+![Compressed Page](./src/static/images/compressedpage.png)
+### Small Screen 
+![small Page](./src/static/images/smallpage.png)
 ## Setup 
 Sebelum menjalankan program, pastikan sudah menginstall Python terlebih dahulu. Cek versi Python pada command prompt dengan
 

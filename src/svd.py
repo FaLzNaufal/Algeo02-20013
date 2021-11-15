@@ -122,9 +122,10 @@ def compress(filename, rPercentage):
         rec[:,:,0], cbr, fsvdbr = getCompressed(mat[:,:,0], r)
         rec[:,:,1], cbg, fsvdbg = getCompressed(mat[:,:,1], r)
         rec[:,:,2], cbb, fsvdbb = getCompressed(mat[:,:,2], r)
-        compressedBytes = cbr+cbg+cbb
         if(mat.shape[2] == 4):
-            compressedBytes+=mat[:,:,3].nbytes
+            rec[:,:,3], cba, fsvdba = getCompressed(mat[:,:,3], r)
+            compressedBytes += cba
+        compressedBytes += cbr+cbg+cbb
         rec = np.clip(rec, 0, 255)
         rec = rec.astype(np.uint8)
         resized = Image.fromarray(rec)

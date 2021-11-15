@@ -50,7 +50,7 @@ Running on http://127.0.0.1:5000/
 ```
 Atau, menggunakan IDE seperti Visual Studio Code dan klik tombol run.
 
-## Kontributor 
+## Contributor
 Program dibuat untuk memenuhi Tugas Besar 2 IF2123 semester 1 tahun ajaran 2021/2022. Pembuat program adalah :
 - Ilham Prasetyo Wibowo (13520013)
 - Gregorius Moses Marevson (13520052)
